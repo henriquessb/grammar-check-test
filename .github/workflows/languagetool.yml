@@ -1,0 +1,23 @@
+name: LanguageTool
+on: pull_request
+jobs:
+  grammar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run LanguageTool API
+        run: |
+          for file in $(git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -E '\.md$|\.txt$'); do
+            curl -s -X POST \
+              -d "language=en-US&text=$(jq -s -R -r @uri < $file)" \
+              https://api.languagetool.org/v2/check \
+            | jq --arg f "$file" '
+                .matches[] |
+                "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"'
+          done > report.md
+      - uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ## LanguageTool Report
+            $(cat report.md || echo "*No issues found.*")
