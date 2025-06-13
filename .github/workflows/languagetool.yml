@@ -21,10 +21,22 @@ jobs:
                 .matches[] |
                 "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"'
           done > report.md
-      - uses: peter-evans/create-or-update-comment@v3
+      - name: Read report
+        id: report
+        run: |
+          if [ -f report.md ]; then
+            content=$(cat report.md)
+          else
+            content="*No issues found.*"
+          fi
+          # Escape percent signs for GitHub Actions
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "content=$content" >> $GITHUB_OUTPUT
+      - name: Comment on PR
+        uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ## LanguageTool Report
-            $(cat report.md || echo "*No issues found.*")
+          body: ${{ steps.report.outputs.content }}
