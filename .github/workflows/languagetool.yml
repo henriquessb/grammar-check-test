@@ -2,8 +2,10 @@ name: LanguageTool
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
 permissions:
   pull-requests: write
+
 jobs:
   grammar:
     runs-on: ubuntu-latest
