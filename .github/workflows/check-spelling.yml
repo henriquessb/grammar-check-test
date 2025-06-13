@@ -57,11 +57,14 @@ name: Check Spelling
 #     ... otherwise adjust the `with:` as you wish
 
 on:
-  pull_request_target:
+  pull_request:
     types:
     - 'opened'
     - 'reopened'
     - 'synchronize'
+
+permissions:
+  pull-requests: write
 
 jobs:
   spelling:
