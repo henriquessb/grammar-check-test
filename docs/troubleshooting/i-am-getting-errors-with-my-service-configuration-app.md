@@ -26,7 +26,7 @@ To avoid errors, link or install the configuration app in the same workspace the
 
 1. In a terminal, go to the desired workspace using the following VTEX IO CLI command:
 
-    ```
+    ```sh
     vtex use workspace {desiredWorkspace}
     ```
 
@@ -41,7 +41,7 @@ To publish your configuration app without installing the service in the master w
 
 1. In a terminal, go to the desired workspace using the following VTEX IO CLI command:
 
-    ```
+    ```sh
     vtex use workspace {desiredWorkspace}
     ```
 
@@ -51,7 +51,7 @@ To publish your configuration app without installing the service in the master w
 3. Create a new version of your configuration app by following the instructions in [Releasing a new app version](https://developers.vtex.com/docs/guides/vtex-io-documentation-releasing-a-new-app-version).
 4. [Publish](https://developers.vtex.com/docs/guides/vtex-io-documentation-publishing-an-app) your configuration app using the following command:
 
-    ```
+    ```sh
     vtex publish -w {desiredWorkspace}
     ```
 
