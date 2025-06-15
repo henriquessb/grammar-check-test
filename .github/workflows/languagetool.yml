@@ -17,7 +17,7 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           git fetch origin ${{ github.event.pull_request.base.ref }}
-          for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.txt$'); do
+          for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.mdx$'); do
             echo "Reviewing $file"
             # Fetch LanguageTool results and aggregate all issues for the file
             result=$(curl -s -X POST \
