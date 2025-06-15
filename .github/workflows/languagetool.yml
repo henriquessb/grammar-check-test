@@ -15,11 +15,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          cd "$GITHUB_WORKSPACE"
           git fetch origin ${{ github.event.pull_request.base.ref }}
           for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.txt$'); do
+            echo "Reviewing $file"
             # Fetch LanguageTool results and aggregate all issues for the file
             result=$(curl -s -X POST \
-              -d "language=en-US&text=$(awk 'f{print} /^---/{f^=1}' \"$file\" | jq -s -R -r @uri)" \
+              -d "language=en-US&text=$(awk 'f{print} /^---/{f^=1}' "$file" | jq -s -R -r @uri)" \
               https://api.languagetool.org/v2/check \
             | jq -r --arg f "$file" '
                 .matches[]? |
