@@ -20,13 +20,15 @@ repo_name = event.get('repository', {}).get('full_name')
 
 # Find changed markdown files
 def get_changed_md_files():
+    valid_folders = ('docs/guides', 'docs/troubleshooting', 'docs/faststore', 'docs/release-notes')
+
     files = []
     if 'pull_request' in event:
         files_url = event['pull_request']['url'] + '/files'
         headers = {'Authorization': f'token {GITHUB_TOKEN}'}
         resp = requests.get(files_url, headers=headers)
         for file in resp.json():
-            if file['filename'].endswith(('.md','.mdx')):
+            if file['filename'].endswith(('.md','.mdx')) and file['filename'].startswith(valid_folders):
                 files.append(file['filename'])
     return files
 
