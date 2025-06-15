@@ -1,44 +1,25 @@
 name: LanguageTool
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  pull-requests: write
-
+on: pull_request
 jobs:
   grammar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-      - name: Run LanguageTool API
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
+      - name: Run LanguageTool API and comment per file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for file in $(git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -E '\.md$|\.txt$'); do
-            curl -s -X POST \
+            result=$(curl -s -X POST \
               -d "language=en-US&text=$(jq -s -R -r @uri < $file)" \
               https://api.languagetool.org/v2/check \
             | jq --arg f "$file" '
-                .matches[] |
-                "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"'
-          done > report.md
-      - name: Read report
-        id: report
-        run: |
-          if [ -f report.md ]; then
-            content=$(cat report.md)
-          else
-            content="*No issues found.*"
-          fi
-          # Escape percent signs for GitHub Actions
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "content=$content" >> $GITHUB_OUTPUT
-      - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.report.outputs.content }}
+                .matches[]? |
+                "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"')
+            if [ -z "$result" ]; then
+              result="*No issues found.*"
+            fi
+            gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file\n$result"
+          done
