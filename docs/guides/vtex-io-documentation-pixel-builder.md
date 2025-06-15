@@ -3,7 +3,7 @@ title: "Pixel builder"
 slug: "vtex-io-documentation-pixel-builder"
 hidden: false
 createdAt: "2024-08-15T14:00:00.000Z"
-updatedAt: ""
+updatedAt: "2024-08-15T14:00:00.000Z"
 excerpt: "Learn how to use the VTEX IO Pixel builder."
 ---
 
