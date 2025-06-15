@@ -17,13 +17,18 @@ jobs:
         run: |
           git fetch origin ${{ github.event.pull_request.base.ref }}
           for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.txt$'); do
+            # Fetch LanguageTool results
             result=$(curl -s -X POST \
               -d "language=en-US&text=$(jq -s -R -r @uri < $file)" \
               https://api.languagetool.org/v2/check \
             | jq --arg f "$file" '
                 .matches[]? |
                 "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"')
+
+            # Post a separate comment for each file
             if [ -n "$result" ]; then
-              gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file\n$result"
+              for line in "$result"; do
+                gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file\n$line"
+              done
             fi
           done
