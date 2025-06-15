@@ -17,18 +17,20 @@ jobs:
         run: |
           git fetch origin ${{ github.event.pull_request.base.ref }}
           for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.txt$'); do
-            # Fetch LanguageTool results
+            # Fetch LanguageTool results and aggregate all issues for the file
             result=$(curl -s -X POST \
               -d "language=en-US&text=$(jq -s -R -r @uri < $file)" \
               https://api.languagetool.org/v2/check \
-            | jq --arg f "$file" '
+            | jq -r --arg f "$file" '
                 .matches[]? |
                 "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"')
 
-            # Post a separate comment for each file
             if [ -n "$result" ]; then
-              for line in "$result"; do
-                gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file\n$line"
-              done
+              # Truncate if too long for GitHub comment
+              max=65000
+              if [ ${#result} -gt $max ]; then
+                result="${result:0:$max}\n\n...truncated, too many issues to display."
+              fi
+              gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file $result"
             fi
           done
