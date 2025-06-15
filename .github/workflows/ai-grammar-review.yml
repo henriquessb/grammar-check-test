@@ -3,7 +3,8 @@ name: AI Grammar Review
 on:
   pull_request:
     paths:
-      - 'docs/**/*.{md,mdx}'
+      - 'docs/**/*.md'
+      - 'docs/**/*.mdx'
 
 permissions:
   pull-requests: write
