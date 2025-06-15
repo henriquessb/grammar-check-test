@@ -62,13 +62,11 @@ def main():
     if not files:
         print("No Markdown files changed.")
         return
-    review_results = []
     for file in files:
         if os.path.exists(file):
             review = review_grammar(file)
-            review_results.append(f"### Review for `{file}`\n{review}")
-    if review_results:
-        post_pr_comment("\n\n".join(review_results))
+            body = f"### Review for `{file}`\n{review}"
+            post_pr_comment(body)
 
 if __name__ == "__main__":
     main()
