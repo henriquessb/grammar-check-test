@@ -26,7 +26,7 @@ def get_changed_md_files():
         headers = {'Authorization': f'token {GITHUB_TOKEN}'}
         resp = requests.get(files_url, headers=headers)
         for file in resp.json():
-            if file['filename'].endswith('.md'):
+            if file['filename'].endswith(('.md','.mdx')):
                 files.append(file['filename'])
     return files
 
