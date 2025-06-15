@@ -33,7 +33,7 @@ def get_changed_md_files():
 def review_grammar(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
-    prompt = f"Review the following Markdown for grammar issues. Suggest corrections and explain any problems found.\n\n{content}"
+    prompt = f"Review the following Markdown for grammar issues. Suggest corrections and explain any problems found. Do not show the whole original text. Only list the issues, where they occurred and the corrections, plus a summary of the review.\n\n{content}"
     data = {
         "contents": [{"parts": [{"text": prompt}]}]
     }
