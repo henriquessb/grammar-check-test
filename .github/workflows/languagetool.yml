@@ -1,25 +1,43 @@
 name: LanguageTool
-on: pull_request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  pull-requests: write
 jobs:
   grammar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install GitHub CLI
-        run: sudo apt-get update && sudo apt-get install -y gh
+        with:
+          fetch-depth: 2
       - name: Run LanguageTool API and comment per file
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for file in $(git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -E '\.md$|\.txt$'); do
-            result=$(curl -s -X POST \
-              -d "language=en-US&text=$(jq -s -R -r @uri < $file)" \
+          cd "$GITHUB_WORKSPACE"
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.mdx$'); do
+            echo "Reviewing $file"
+            # Extract body (skip frontmatter)
+            body=$(awk 'front==2{print} /^---/{front++}' "$file")
+            echo "--- File body for $file ---"
+            echo "$body"
+            # Fetch LanguageTool results and aggregate all issues for the file
+            result=$(echo "$body" | curl -s -X POST \
+              -d "language=en-US&text=$(jq -s -R -r @uri)" \
               https://api.languagetool.org/v2/check \
-            | jq --arg f "$file" '
+            | jq -r --arg f "$file" '
                 .matches[]? |
                 "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"')
-            if [ -z "$result" ]; then
-              result="*No issues found.*"
+            echo "--- Review of $file ---"
+            echo "$result"
+            if [ -n "$result" ]; then
+              # Truncate if too long for GitHub comment
+              max=65000
+              if [ ${#result} -gt $max ]; then
+                result="${result:0:$max}\n\n...truncated, too many issues to display."
+              fi
+              gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file $result"
             fi
-            gh pr comment ${{ github.event.pull_request.number }} --body "## LanguageTool Report for $file\n$result"
           done
