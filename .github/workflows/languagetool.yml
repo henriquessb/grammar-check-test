@@ -20,7 +20,7 @@ jobs:
           for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.mdx$'); do
             echo "Reviewing $file"
             # Extract body (skip frontmatter)
-            body=$(awk 'f{print} /^---/{f^=1}' "$file")
+            body=$(awk 'front==2{print} /^---/{front++}' "$file")
             echo "--- File body for $file ---"
             echo "$body"
             # Fetch LanguageTool results and aggregate all issues for the file
