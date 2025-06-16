@@ -19,14 +19,19 @@ jobs:
           git fetch origin ${{ github.event.pull_request.base.ref }}
           for file in $(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -E '\.md$|\.mdx$'); do
             echo "Reviewing $file"
+            # Extract body (skip frontmatter)
+            body=$(awk 'f{print} /^---/{f^=1}' "$file")
+            echo "--- File body for $file ---"
+            echo "$body"
             # Fetch LanguageTool results and aggregate all issues for the file
-            result=$(curl -s -X POST \
-              -d "language=en-US&text=$(awk 'f{print} /^---/{f^=1}' "$file" | jq -s -R -r @uri)" \
+            result=$(echo "$body" | curl -s -X POST \
+              -d "language=en-US&text=$(jq -s -R -r @uri)" \
               https://api.languagetool.org/v2/check \
             | jq -r --arg f "$file" '
                 .matches[]? |
                 "- [\($f):\(.offset)] \(.message) — proposed: \(.replacements[].value)"')
-            echo "$result\n\n"
+            echo "--- Review of $file ---"
+            echo "$result"
             if [ -n "$result" ]; then
               # Truncate if too long for GitHub comment
               max=65000
