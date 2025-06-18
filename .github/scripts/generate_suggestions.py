@@ -19,7 +19,7 @@ def apply_issues_and_generate_diff(filename, issues):
     modified_lines = original_lines[:]
     explanation_map = {}
 
-    for issue in issues["issues"]:
+    for issue in issues:
         line_idx = issue["line"] - 1  # 0-based index
         original_line = modified_lines[line_idx]
         if issue["text"] not in original_line:
