@@ -33,11 +33,15 @@ jobs:
         run: |
           python .github/scripts/grammar_review.py
 
-      - name: Generate suggestions
-        run: python .github/scripts/generate_suggestions.py
+      - name: Download reviewdog
+        run: |
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
 
       - name: Run reviewdog suggester
-        uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: json-suggester
-          suggestions_file: suggestions.diff
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./reviewdog -f=diff \
+            -name="json-suggester" \
+            -reporter=github-pr-review \
+            -fail-on-error=false < suggestions.diff
