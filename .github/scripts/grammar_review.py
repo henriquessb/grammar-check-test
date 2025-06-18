@@ -62,10 +62,10 @@ def review_grammar(file_path):
         f"{content}"
     )
 
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    response = model.generate_content(
-        prompt,
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
         config={
             "response_mime_type": "application/json",
             "temperature": 0.2,
