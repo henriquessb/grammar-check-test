@@ -6,7 +6,6 @@ type: "added"
 createdAt: "2024-12-23T00:00:00.219Z"
 excerpt: "Improved performance experience for FastStore stores."
 ---
-
 FastStore has undergone significant optimizations to improve mobile performance, achieving a Lighthouse score improvement from 64 to 95.
 
 ## What has changed?
