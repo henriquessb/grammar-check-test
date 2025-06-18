@@ -33,6 +33,9 @@ jobs:
         run: |
           python .github/scripts/grammar_review.py
 
+      - name: Generate suggestions
+        run: python .github/scripts/generate_suggestions.py
+
       - name: Download reviewdog
         run: |
           curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
