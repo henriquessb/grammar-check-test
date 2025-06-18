@@ -30,3 +30,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python .github/scripts/grammar_review.py
+
+      - name: Run Reviewdog for grammar suggestions
+        uses: reviewdog/reviewdog@v0.17.7
+        with:
+          reporter: github-pr-review
+          fail_on_error: false
+          filter_mode: nofilter
+          input: reviewdog_output.json
+          format: rdjson
+
+      - name: Post grammar review summary as PR comment
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f grammar_summaries.txt ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body-file grammar_summaries.txt || true
+          fi
