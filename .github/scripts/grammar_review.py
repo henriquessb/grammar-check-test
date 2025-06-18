@@ -33,15 +33,38 @@ def get_changed_md_files():
 def review_grammar(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
+
+    response_schema = {
+        "type": "object",
+        "properties": {
+            "issues": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "line": {"type": "integer"},
+                        "text": {"type": "string"},
+                        "correction": {"type": "string"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["line", "text", "correction", "explanation"]
+                }
+            },
+            "summary": {"type": "string"}
+        },
+        "required": ["issues", "summary"]
+    }
+
     prompt = (
         "Review the following Markdown for grammar issues. "
-        "Suggest corrections and explain any problems found. "
+        "Return a JSON object with an 'issues' array (each with line, text, correction, explanation) and a 'summary' string. "
         "Do not show the whole original text. Only list the issues, where they occurred and the corrections, plus a summary of the review.\n\n"
         f"{content}"
     )
+
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel('gemini-2.5-flash')
-    response = model.generate_content(prompt)
+    response = model.generate_content(prompt, response_schema=response_schema)
     try:
         return response.text
     except Exception:
