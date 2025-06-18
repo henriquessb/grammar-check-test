@@ -64,7 +64,14 @@ def review_grammar(file_path):
 
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel('gemini-2.5-flash')
-    response = model.generate_content(prompt, response_schema=response_schema)
+    response = model.generate_content(
+        prompt,
+        config={
+            "response_mime_type": "application/json",
+            "temperature": 0.2,
+            "response_schema": response_schema
+        }
+    )
     try:
         return response.text
     except Exception:
