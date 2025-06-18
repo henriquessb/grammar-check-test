@@ -58,7 +58,7 @@ def apply_issues_and_generate_diff(filename, issues):
 def main():
     issues_data = load_issues(ISSUE_FILE)
     all_diffs = []
-
+    print(issues_data)
     for filename, issues in issues_data.items():
         if not Path(filename).is_file():
             print(f"[skip] File '{filename}' not found.")
