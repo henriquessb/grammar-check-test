@@ -1,14 +1,12 @@
 import os
-import requests
 import json
-import glob
+import requests
 from github import Github
+import google.generativeai as genai
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 GITHUB_EVENT_PATH = os.environ.get('GITHUB_EVENT_PATH')
-
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=" + GEMINI_API_KEY
 
 # Load PR info
 event = {}
@@ -35,20 +33,19 @@ def get_changed_md_files():
 def review_grammar(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
-    prompt = f"Review the following Markdown for grammar issues. Suggest corrections and explain any problems found. Do not show the whole original text. Only list the issues, where they occurred and the corrections, plus a summary of the review.\n\n{content}"
-    data = {
-        "contents": [{"parts": [{"text": prompt}]}]
-    }
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(GEMINI_API_URL, headers=headers, json=data)
-    if response.ok:
-        result = response.json()
-        try:
-            return result['candidates'][0]['content']['parts'][0]['text']
-        except Exception:
-            return "No review returned."
-    else:
-        return f"Error: {response.text}"
+    prompt = (
+        "Review the following Markdown for grammar issues. "
+        "Suggest corrections and explain any problems found. "
+        "Do not show the whole original text. Only list the issues, where they occurred and the corrections, plus a summary of the review.\n\n"
+        f"{content}"
+    )
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    response = model.generate_content(prompt)
+    try:
+        return response.text
+    except Exception:
+        return "No review returned."
 
 def post_pr_comment(body):
     if not (GITHUB_TOKEN and repo_name and pr_number):
