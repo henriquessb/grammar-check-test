@@ -32,7 +32,7 @@ jobs:
           python .github/scripts/grammar_review.py
 
       - name: Run Reviewdog for grammar suggestions
-        uses: reviewdog/reviewdog@v0
+        uses: reviewdog/action-reviewdog@v0
         with:
           reporter: github-pr-review
           fail_on_error: false
