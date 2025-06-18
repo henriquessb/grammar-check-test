@@ -3,7 +3,6 @@ import json
 import requests
 from github import Github
 from google import genai
-import sys
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
@@ -78,36 +77,21 @@ def review_grammar(file_path):
     except Exception:
         return "No review returned."
 
-def make_rdjson_diagnostic(file, issue):
-    return {
-        "message": issue["explanation"],
-        "location": {
-            "path": file,
-            "range": {
-                "start": {"line": issue["line"], "column": 1},
-                "end": {"line": issue["line"], "column": 1}
-            }
-        },
-        "suggestions": [
-            {
-                "range": {
-                    "start": {"line": issue["line"], "column": 1},
-                    "end": {"line": issue["line"], "column": 1}
-                },
-                "text": issue["correction"]
-            }
-        ],
-        "severity": "INFO",
-        "code": {"value": "AI Grammar"}
-    }
+def post_pr_comment(body):
+    if not (GITHUB_TOKEN and repo_name and pr_number):
+        print("Missing GitHub context for commenting.")
+        return
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(repo_name)
+    pr = repo.get_pull(pr_number)
+    pr.create_issue_comment(body)
 
 def main():
     files = get_changed_md_files()
     if not files:
         print("No Markdown files changed.")
         return
-    diagnostics = []
-    summaries = []
+    all_issues = {}
     for file in files:
         if os.path.exists(file):
             review = review_grammar(file)
@@ -115,19 +99,16 @@ def main():
                 review_json = json.loads(review)
             except Exception:
                 continue
-            for issue in review_json.get("issues", []):
-                diagnostics.append(make_rdjson_diagnostic(file, issue))
-            summaries.append(f"### Review for `{file}`\n{review_json.get('summary', '')}")
-    # Write rdjson for reviewdog
-    rdjson = {
-        "source": {"name": "ai-grammar-review", "url": "https://github.com/reviewdog/reviewdog"},
-        "diagnostics": diagnostics
-    }
-    with open("reviewdog_output.json", "w", encoding="utf-8") as f:
-        json.dump(rdjson, f)
-    # Write summaries for PR comment
-    with open("grammar_summaries.txt", "w", encoding="utf-8") as f:
-        f.write("\n\n".join(summaries))
+            # Collect issues for this file
+            all_issues[file] = review_json.get("issues", [])
+            # Post only the summary as a PR comment
+            summary = review_json.get("summary", "")
+            if summary:
+                body = f"### Review for `{file}`\n{summary}"
+                post_pr_comment(body)
+    # Write all issues to a single issues.json file
+    with open("issues.json", "w", encoding="utf-8") as f:
+        json.dump(all_issues, f, indent=2)
 
 if __name__ == "__main__":
     main()

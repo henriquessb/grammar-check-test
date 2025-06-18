@@ -5,9 +5,11 @@ on:
     paths:
       - 'docs/**/*.md'
       - 'docs/**/*.mdx'
+    types: [opened, synchronize, reopened]
 
 permissions:
   pull-requests: write
+  contents: read
 
 jobs:
   grammar-review:
@@ -31,20 +33,11 @@ jobs:
         run: |
           python .github/scripts/grammar_review.py
 
-      - name: Run Reviewdog for grammar suggestions
-        uses: reviewdog/action-reviewdog@v0
-        with:
-          reporter: github-pr-review
-          fail_on_error: false
-          filter_mode: nofilter
-          input: reviewdog_output.json
-          format: rdjson
+      - name: Generate suggestions
+        run: python .github/scripts/generate_suggestions.py
 
-      - name: Post grammar review summary as PR comment
-        if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -f grammar_summaries.txt ]; then
-            gh pr comment ${{ github.event.pull_request.number }} --body-file grammar_summaries.txt || true
-          fi
+      - name: Run reviewdog suggester
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: json-suggester
+          suggestions_file: suggestions.diff
