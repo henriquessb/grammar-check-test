@@ -51,12 +51,11 @@ def main():
         diff = apply_issues_and_generate_diff(filename, issues)
         if diff:
             all_diffs.extend(diff)
-            all_diffs.append("")  # Blank line between file diffs
 
 
     if all_diffs:
         # Remove empty elements from all_diffs
-        all_diffs = [line for line in all_diffs if line.strip() != ""]
+        all_diffs = [line for line in all_diffs if line.strip() != ""].append("")
         with open(SUGGESTIONS_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(all_diffs))
         print(f"[done] Suggestions written to {SUGGESTIONS_FILE}")
