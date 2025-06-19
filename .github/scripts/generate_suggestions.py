@@ -15,11 +15,7 @@ def load_issues(path):
 
 
 def apply_issues_and_generate_diff(filename, issues):
-    original_lines = Path(filename).read_text(encoding="utf-8").splitlines(keepends=True)
-
-    for i in range(len(original_lines)):
-        original_lines[i] = original_lines[i].rstrip("\n")
-
+    original_lines = Path(filename).read_text(encoding="utf-8").splitlines()
     modified_lines = original_lines[:]
 
     for issue in issues:
