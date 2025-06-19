@@ -57,9 +57,7 @@ def main():
         with open(SUGGESTIONS_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(all_diffs))
         print(f"[done] Suggestions written to {SUGGESTIONS_FILE}")
-        all_diffs_str = str("\n".join(all_diffs))
-        for i in range(0, len(all_diffs_str), 1000):
-            print(all_diffs_str[i:i+1000])
+        print("\n".join(all_diffs))
     else:
         print("[done] No diffs generated.")
 
