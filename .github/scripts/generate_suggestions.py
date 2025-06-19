@@ -17,7 +17,6 @@ def load_issues(path):
 def apply_issues_and_generate_diff(filename, issues):
     original_lines = Path(filename).read_text(encoding="utf-8").splitlines(keepends=True)
     modified_lines = original_lines[:]
-    explanation_map = {}
 
     for issue in issues:
         line_idx = issue["line"] - 1  # 0-based index
@@ -26,7 +25,7 @@ def apply_issues_and_generate_diff(filename, issues):
             print(f"[warn] Text '{issue['text']}' not found in line {issue['line']} of {filename}")
             continue
         modified_line = original_line.replace(issue["text"], issue["correction"], 1)
-        modified_lines[line_idx] = f"{modified_line}  # Suggestion: {issue["explanation"]}"
+        modified_lines[line_idx] = f"{modified_line.replace("\n", "")}  # Suggestion: {issue["explanation"]}"
 
     diff = list(
         difflib.unified_diff(
