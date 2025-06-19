@@ -26,8 +26,7 @@ def apply_issues_and_generate_diff(filename, issues):
             print(f"[warn] Text '{issue['text']}' not found in line {issue['line']} of {filename}")
             continue
         modified_line = original_line.replace(issue["text"], issue["correction"], 1)
-        modified_lines[line_idx] = modified_line
-        explanation_map[line_idx] = issue["explanation"]
+        modified_lines[line_idx] = f"{modified_line}  # Suggestion: {issue["explanation"]}"
 
     diff = list(
         difflib.unified_diff(
@@ -39,20 +38,7 @@ def apply_issues_and_generate_diff(filename, issues):
         )
     )
 
-    # Inject explanations
-    final_diff = []
-    line_idx = -1  # Track modified line index
-    for line in diff:
-        final_diff.append(line)
-        if line.startswith("+") and not line.startswith("+++"):
-            line_idx += 1
-            if line_idx in explanation_map:
-                explanation = explanation_map[line_idx]
-                final_diff.append(f"+# Suggestion: {explanation}")
-        elif not line.startswith("-") and not line.startswith("@@"):
-            line_idx += 1
-
-    return final_diff
+    return diff
 
 
 def main():
