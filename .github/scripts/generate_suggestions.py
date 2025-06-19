@@ -31,7 +31,7 @@ def apply_issues_and_generate_diff(filename, issues):
         difflib.unified_diff(
             original_lines,
             modified_lines,
-            fromfile=filename,
+            fromfile=f"/{filename}",
             tofile=filename,
             lineterm=""
         )
@@ -48,7 +48,7 @@ def main():
         if not Path(filename).is_file():
             print(f"[skip] File '{filename}' not found.")
             continue
-        diff = apply_issues_and_generate_diff(f"/{filename}", issues)
+        diff = apply_issues_and_generate_diff(filename, issues)
         if diff:
             all_diffs.extend(diff)
             all_diffs.append("")  # Blank line between file diffs
