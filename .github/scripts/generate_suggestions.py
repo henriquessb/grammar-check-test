@@ -60,7 +60,7 @@ def main():
         with open(SUGGESTIONS_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(all_diffs))
         print(f"[done] Suggestions written to {SUGGESTIONS_FILE}")
-        print("\n".join(all_diffs))
+        print(all_diffs)
     else:
         print("[done] No diffs generated.")
 
