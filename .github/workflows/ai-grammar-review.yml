@@ -47,4 +47,4 @@ jobs:
           ./bin/reviewdog -f=diff \
             -name="json-suggester" \
             -reporter=github-pr-review \
-            -fail-on-error=false < suggestions.diff
+            -fail-on-error=false < suggestions.diff -tee
