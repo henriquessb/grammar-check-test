@@ -32,7 +32,7 @@ def apply_issues_and_generate_diff(filename, issues):
             original_lines,
             modified_lines,
             fromfile=f"/{filename}",
-            tofile=filename,
+            tofile=f"/{filename}",
             lineterm=""
         )
     )
