@@ -53,7 +53,10 @@ def main():
             all_diffs.extend(diff)
             all_diffs.append("")  # Blank line between file diffs
 
+
     if all_diffs:
+        # Remove empty elements from all_diffs
+        all_diffs = [line for line in all_diffs if line.strip() != ""]
         with open(SUGGESTIONS_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(all_diffs))
         print(f"[done] Suggestions written to {SUGGESTIONS_FILE}")
