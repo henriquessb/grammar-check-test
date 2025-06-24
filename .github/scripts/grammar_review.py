@@ -32,7 +32,10 @@ def get_changed_md_files():
 
 def review_grammar(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+        lines = f.readlines()
+
+    # Add line numbers to each line
+    numbered_content = ''.join(f"{i+1}: {line}" for i, line in enumerate(lines))
 
     response_schema = {
         "type": "object",
@@ -57,9 +60,10 @@ def review_grammar(file_path):
 
     prompt = (
         "Review the following Markdown for grammar issues. "
-        "Return a JSON object with an 'issues' array (each with line, text, correction, explanation) and a 'summary' string. "
-        "Do not show the whole original text. Only list the issues, where they occurred and the corrections, plus a summary of the review.\n\n"
-        f"{content}"
+        "Each line is prefixed with its line number (e.g., '12: ...'). "
+        "When reporting issues, use the provided line numbers. "
+        "Return a JSON object with an 'issues' array (each with line, text, correction, explanation) and a 'summary' string.\n\n"
+        f"{numbered_content}"
     )
 
     client = genai.Client(api_key=GEMINI_API_KEY)
