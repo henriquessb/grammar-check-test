@@ -20,6 +20,9 @@ def apply_issues_and_generate_diff(filename, issues):
 
     for issue in issues:
         line_idx = issue["line"] - 1  # 0-based index
+        if line_idx < 0 or line_idx >= len(modified_lines):
+            print(f"[warn] Line {issue['line']} for text '{issue['text']}' is out of range in {filename}")
+            continue
         original_line = modified_lines[line_idx]
         if issue["text"] not in original_line:
             print(f"[warn] Text '{issue['text']}' not found in line {issue['line']} of {filename}")
