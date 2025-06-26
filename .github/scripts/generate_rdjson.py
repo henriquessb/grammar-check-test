@@ -61,6 +61,9 @@ def main():
         "source": {"name": "ai-grammar-review", "url": "https://github.com/reviewdog/reviewdog"},
         "diagnostics": diagnostics
     }
+
+    print(rdjson)
+
     with open(RDJSON_FILE, "w", encoding="utf-8") as f:
         json.dump(rdjson, f, indent=2)
     print(f"[done] RDFormat suggestions written to {RDJSON_FILE}")
