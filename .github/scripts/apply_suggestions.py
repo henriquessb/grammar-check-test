@@ -67,6 +67,8 @@ def post_review(suggestions):
         "comments": suggestions
     }
 
+    print(f"Suggestions:\n{data}")
+
     r = requests.post(url, headers=HEADERS, json=data)
     if r.status_code >= 400:
         print(f"❌ Failed to post review: {r.status_code} - {r.text}")
