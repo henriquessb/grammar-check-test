@@ -10,6 +10,8 @@ on:
 permissions:
   pull-requests: write
   contents: read
+  checks: write
+  issues: write
 
 jobs:
   grammar-review:
@@ -36,19 +38,17 @@ jobs:
       - name: Generate diff
         run: python .github/scripts/generate_diff.py
 
-      - name: Download reviewdog
+      - name: Apply diff locally
         run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
+            if [ -f suggestions.diff ]; then
+              git apply suggestions.diff;
+              git diff --stat;
+            else
+              echo "No suggestions.diff file found"
+            fi
 
       - name: Run reviewdog suggester
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -f suggestions.diff ]; then
-            ./bin/reviewdog -f=diff -f.diff.strip=1 \
-              -name="json-suggester" \
-              -reporter=github-pr-review \
-              -fail-on-error=false < suggestions.diff -tee
-          else
-            echo "No suggestions.diff file found, skipping reviewdog."
-          fi
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: Grammar reviewer
+          github_token: ${{ secrets.GITHUB_TOKEN }}
