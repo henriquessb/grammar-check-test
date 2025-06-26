@@ -18,6 +18,9 @@ def apply_issues_and_generate_diff(filename, issues):
     original_lines = Path(filename).read_text(encoding="utf-8").splitlines()
     modified_lines = original_lines[:]
 
+    # Track which lines have suggestions and their explanations
+    suggestions = {}
+
     for issue in issues:
         line_idx = issue["line"] - 1  # 0-based index
         if line_idx < 0 or line_idx >= len(modified_lines):
@@ -27,8 +30,8 @@ def apply_issues_and_generate_diff(filename, issues):
         if issue["text"] not in original_line:
             print(f"[warn] Text '{issue['text']}' not found in line {issue['line']} of {filename}")
             continue
-        modified_line = original_line.replace(issue["text"], issue["correction"], 1)
-        modified_lines[line_idx] = f"{modified_line}  # Suggestion: {issue["explanation"]}"
+        modified_lines[line_idx] = original_line.replace(issue["text"], issue["correction"], 1)
+        suggestions[line_idx] = issue["explanation"]
 
     diff = list(
         difflib.unified_diff(
@@ -39,6 +42,37 @@ def apply_issues_and_generate_diff(filename, issues):
             lineterm=""
         )
     )
+
+    # Insert explanation comments after each suggestion hunk
+    if suggestions:
+        new_diff = []
+        i = 0
+        while i < len(diff):
+            new_diff.append(diff[i])
+            # Look for suggestion lines (those starting with '+', but not '+++')
+            if diff[i].startswith('@@'):
+                # Find the line numbers in the hunk header
+                hunk_header = diff[i]
+                # Parse the hunk header to get the starting line number in the new file
+                import re
+                m = re.match(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", hunk_header)
+                if m:
+                    start_line = int(m.group(1)) - 1
+                    line_offset = 0
+                    i += 1
+                    while i < len(diff) and not diff[i].startswith('@@'):
+                        if diff[i].startswith('+') and not diff[i].startswith('+++'):
+                            line_no = start_line + line_offset
+                            if line_no in suggestions:
+                                # Insert the comment line after this suggestion
+                                new_diff.append(f"# comment: {suggestions[line_no]}")
+                        if not diff[i].startswith('-'):
+                            line_offset += 1
+                        new_diff.append(diff[i])
+                        i += 1
+                    continue
+            i += 1
+        diff = new_diff
 
     return diff
 
