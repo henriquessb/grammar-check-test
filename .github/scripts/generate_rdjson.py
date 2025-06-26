@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 ISSUE_FILE = "issues.json"
-RDJSON_FILE = "suggestion.rdjson"
+RDJSON_FILE = "suggestions.rdjson"
 
 def load_issues(path):
     with open(path, "r", encoding="utf-8") as f:
