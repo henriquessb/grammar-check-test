@@ -36,11 +36,16 @@ jobs:
       - name: Generate diff
         run: python .github/scripts/generate_diff.py
 
-      - name: Download reviewdog
+      - name: Apply suggestions
         run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
+            if [ -f suggestions.diff ]; then
+              git apply suggestions.diff;
+            else
+              echo "No suggestions.diff file found"
+            fi
 
       - name: Run reviewdog suggester
-        uses: reviewdog/action-setup@v1
+        uses: reviewdog/action-suggester@v1
         with:
-          reviewdog_version: latest
+          tool_name: Grammar reviewer
+          github_token: ${{ secrets.GITHUB_TOKEN }}
