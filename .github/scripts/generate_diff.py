@@ -27,8 +27,7 @@ def apply_issues_and_generate_diff(filename, issues):
         if issue["text"] not in original_line:
             print(f"[warn] Text '{issue['text']}' not found in line {issue['line']} of {filename}")
             continue
-        modified_line = original_line.replace(issue["text"], issue["correction"], 1)
-        modified_lines[line_idx] = f"{modified_line}  # Suggestion: {issue["explanation"]}"
+        modified_lines[line_idx] = original_line.replace(issue["text"], issue["correction"], 1)
 
     diff = list(
         difflib.unified_diff(
