@@ -42,7 +42,7 @@ jobs:
         run: |
             if [ -f suggestions.diff ]; then
               git apply suggestions.diff;
-              git status;
+              git diff --stat;
             else
               echo "No suggestions.diff file found"
             fi
