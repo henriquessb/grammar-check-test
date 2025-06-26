@@ -36,7 +36,7 @@ jobs:
       - name: Generate diff
         run: python .github/scripts/generate_diff.py
 
-      - name: Apply suggestions
+      - name: Apply diff locally
         run: |
             if [ -f suggestions.diff ]; then
               git apply suggestions.diff;
