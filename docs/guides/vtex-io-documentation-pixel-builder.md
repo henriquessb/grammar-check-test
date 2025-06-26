@@ -6,7 +6,6 @@ createdAt: "2024-08-15T14:00:00.000Z"
 updatedAt: "2024-08-15T14:00:00.000Z"
 excerpt: "Learn how to use the VTEX IO Pixel builder."
 ---
-
 The `pixel` builder allows the implementation of JavaScript scripts in HTML files. The scripts run in the head or body of every store page and can collect user data, respond to events, and connect with third-party services.
 
 For details about creating Pixel apps, see the [Pixel apps tutorial](https://developers.vtex.com/docs/guides/vtex-io-documentation-1-developnativeintegrationswithpixelapps). You can find examples of available apps that use this builder in the [Pixel Apps section](https://developers.vtex.com/docs/guides/pixel-apps).
