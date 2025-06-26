@@ -26,7 +26,7 @@ def parse_diff(file_path):
 
     for line in lines:
         if line.startswith("+++ "):
-            current_file = line.strip().split("+++ b/")[-1]
+            current_file = line.strip().split("+++ ")[-1]
         elif line.startswith("@@"):
             # End previous suggestion if exists
             if hunk_lines:
