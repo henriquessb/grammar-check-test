@@ -59,7 +59,7 @@ def main():
             diagnostics.append(make_rdjson_diagnostic(filename, issue, original_lines))
         diagnostics = [d for d in diagnostics if d]
     rdjson = {
-        "source": {"name": "ai-grammar-review", "url": "https://github.com/reviewdog/reviewdog"},
+        "source": {"name": "AI Grammar Reviewer"},
         "diagnostics": diagnostics
     }
 

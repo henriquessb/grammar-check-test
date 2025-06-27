@@ -40,14 +40,15 @@ jobs:
 
       - name: Download reviewdog
         run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | \
+            sh -s -- -b .
 
       - name: Run reviewdog suggester
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -f suggestions.rdjson ]; then
-            cat suggestions.rdjson | ./bin/reviewdog -f=rdjson \
+            cat suggestions.rdjson | ./reviewdog -f=rdjson \
               -name="Grammar reviewer" \
               -reporter=github-pr-review \
               -fail-on-error=false -tee
