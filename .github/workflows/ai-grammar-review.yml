@@ -51,7 +51,7 @@ jobs:
             cat suggestions.rdjson | ./reviewdog -f=rdjson \
               -name="Grammar reviewer" \
               -reporter=github-pr-review \
-              -fail-on-error=false -tee
+              -tee
           else
             echo "No suggestions.rdjson file found, skipping reviewdog."
           fi

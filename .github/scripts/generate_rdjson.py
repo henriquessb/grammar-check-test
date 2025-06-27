@@ -29,7 +29,7 @@ def make_rdjson_diagnostic(filename, issue, original_lines):
     return {
         "message": issue["explanation"],
         "location": {
-            "path": filename,
+            "path": f"/{filename}",
             "range": {
                 "start": {"line": issue["line"], "column": start_col},
                 "end": {"line": issue["line"], "column": end_col}
