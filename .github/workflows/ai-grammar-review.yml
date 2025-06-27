@@ -46,7 +46,7 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -f suggestions.rdjson ]; then
-            cat suggestions.rdjson | ./reviewdog -f=rdjson \
+            cat suggestions.rdjson | reviewdog -f=rdjson \
               -name="Grammar reviewer" \
               -reporter=github-pr-review \
               -tee --log-level=debug
