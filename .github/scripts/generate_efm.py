@@ -25,7 +25,11 @@ def main():
             else:
                 line = original_lines[line_idx]
                 text = issue["text"]
-                col = line.find(text) + 1 if text in line else 1
+                if text in line:
+                  col = line.find(text) + 1
+                else:
+                  print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
+                  continue
             msg = issue["explanation"]
             lines.append(f"{filename}:{issue['line']}:{col}: {msg}")
     with open(EFM_FILE, "w", encoding="utf-8") as f:
