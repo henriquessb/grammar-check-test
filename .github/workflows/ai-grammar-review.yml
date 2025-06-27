@@ -38,10 +38,8 @@ jobs:
       - name: Generate rdjson
         run: python .github/scripts/generate_rdjson.py
 
-      - name: Download reviewdog
-        run: |
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | \
-            sh -s -- -b .
+      - name: Install Reviewdog
+        uses: reviewdog/action-setup@v1
 
       - name: Run reviewdog suggester
         env:
