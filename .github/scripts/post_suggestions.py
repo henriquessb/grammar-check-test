@@ -58,7 +58,7 @@ def main():
     for suggestion in suggestions:
         print(suggestion)
         try:
-            post_suggestion_comment(repo, pr, suggestion)
+            post_suggestion_comment(pr, suggestion)
         except Exception as e:
             print(f"Failed to post suggestion: {e}")
 
