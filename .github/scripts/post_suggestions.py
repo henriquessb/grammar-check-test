@@ -29,7 +29,7 @@ def parse_suggestions(file_path):
                 })
     return suggestions
 
-def post_suggestion_comment(repo, pr, suggestion):
+def post_suggestion_comment(pr, suggestion):
     commits = list(pr.get_commits())
     if not commits:
         print("No commits found in PR.")
@@ -54,7 +54,9 @@ def main():
     repo = g.get_repo(repo_name)
     pr = repo.get_pull(pr_number)
     suggestions = parse_suggestions('suggestions.txt')
+    print(f"Found {len(suggestions)} suggestions to post:")
     for suggestion in suggestions:
+        print(suggestion)
         try:
             post_suggestion_comment(repo, pr, suggestion)
         except Exception as e:
