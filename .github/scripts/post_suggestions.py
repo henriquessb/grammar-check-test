@@ -31,7 +31,7 @@ def parse_suggestions(file_path):
 
 def post_suggestion_comment(repo, pr, suggestion):
     for commit in pr.get_commits():
-      print(commit)
+      print(f"Commit SHA: {commit.sha}, Message: {commit.commit.message}")
 
     body = f"**Grammar suggestion:**\n{suggestion['message']}"
     pr.create_review_comment(
