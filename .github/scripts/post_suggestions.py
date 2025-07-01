@@ -33,7 +33,7 @@ def post_suggestion_comment(repo, pr, suggestion):
     body = f"**Grammar suggestion:**\n{suggestion['message']}"
     pr.create_review_comment(
         body=body,
-        commit_id=pr.head.sha,
+        commit_id=pr.commit.sha,
         path=suggestion['file'],
         line=suggestion['line']
     )
