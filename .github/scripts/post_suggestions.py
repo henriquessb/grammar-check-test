@@ -31,13 +31,11 @@ def parse_suggestions(file_path):
 
 def post_suggestion_comment(repo, pr, suggestion):
     body = f"**Grammar suggestion:**\n{suggestion['message']}"
-    repo.create_pull_request_review_comment(
+    pr.create_review_comment(
         body=body,
-        pull_number=pr.number,
         commit_id=pr.head.sha,
         path=suggestion['file'],
-        line=suggestion['line'],
-        side='RIGHT'
+        line=suggestion['line']
     )
 
 def main():
