@@ -35,6 +35,9 @@ def main():
                     continue
     with open(EFM_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
+    print("Errorformat suggestions generated:")
+    for line in lines:
+        print(line)
     print(f"[done] Errorformat suggestions written to {EFM_FILE}")
 
 if __name__ == "__main__":

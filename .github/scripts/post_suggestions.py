@@ -38,10 +38,6 @@ def post_suggestion_comment(pr, suggestion):
         print("No commits found in PR.")
         return
 
-    print(f"Commit SHA: {commits[-1].sha}, Message: {commits[-1].commit.message}")
-
-    print("Posting suggestion comment...")
-
     body = suggestion['message'].replace('\\n', '\n')
     try:
         pr.create_review_comment(
@@ -53,8 +49,6 @@ def post_suggestion_comment(pr, suggestion):
     except Exception as e:
         print(f"Inline comment failed, posting as PR comment instead: {e}")
         pr.create_issue_comment(f"**Grammar suggestion for `{suggestion['file']}` line {suggestion['line']}**:\n{body}")
-
-    print("Suggestion comment posted successfully.")
 
 def main():
     if not (GITHUB_TOKEN and repo_name and pr_number):
@@ -69,7 +63,6 @@ def main():
     suggestions = parse_suggestions('suggestions.txt')
     print(f"Found {len(suggestions)} suggestions to post:")
     for suggestion in suggestions:
-        print(suggestion)
         try:
             post_suggestion_comment(pr, suggestion)
         except Exception as e:
