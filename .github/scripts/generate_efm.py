@@ -31,7 +31,8 @@ def main():
                   print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
                   continue
             msg = issue["explanation"]
-            lines.append(f"{filename}:{issue['line']}:{col}: {msg}")
+            corr = issue["correction"]
+            lines.append(f"{filename}:{issue['line']}:{col}:{corr}: {msg}")
     with open(EFM_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     print(f"[done] Errorformat suggestions written to {EFM_FILE}")

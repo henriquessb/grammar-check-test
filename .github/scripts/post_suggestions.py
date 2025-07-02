@@ -13,20 +13,21 @@ if GITHUB_EVENT_PATH and os.path.exists(GITHUB_EVENT_PATH):
 pr_number = event.get('pull_request', {}).get('number')
 repo_name = event.get('repository', {}).get('full_name')
 
-# Parse errorformat: <file>:<line>:<col>: <message>
+# Parse errorformat: <file>:<line>:<col>:<corr>: <message>
 def parse_suggestions(file_path):
     suggestions = []
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            parts = line.strip().split(':', 3)
-            if len(parts) == 4:
-                file, line_num, col, message = parts
+            parts = line.strip().split(':', 4)
+            if len(parts) == 5:
+                file, line_num, col, corr, message = parts
                 suggestions.append({
                     'file': file,
                     'line': int(line_num),
                     'col': int(col),
-                    'message': message.strip()
+                    'message': f"{message.strip()}\n```suggestion\n{corr.strip()}\n```"
                 })
+    print(suggestions)
     return suggestions
 
 def post_suggestion_comment(pr, suggestion):
