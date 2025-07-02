@@ -26,12 +26,13 @@ def main():
                 line = original_lines[line_idx]
                 text = issue["text"]
                 if text in line:
-                  col = line.find(text) + 1
+                    col = line.find(text) + 1
+                    modified_line = line.replace(issue["text"], issue["correction"], 1)
+                    msg = f"{issue["explanation"]}\n```suggestion\n{modified_line}\n```"
+                    lines.append(f"{filename}:{issue['line']}:{col}: {msg}")
                 else:
-                  print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
-                  continue
-            msg = f"{issue["explanation"]}\n```suggestion\n{issue['correction']}\n```"
-            lines.append(f"{filename}:{issue['line']}:{col}: {msg}")
+                    print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
+                    continue
     with open(EFM_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     print(f"[done] Errorformat suggestions written to {EFM_FILE}")
