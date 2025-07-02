@@ -13,36 +13,41 @@ if GITHUB_EVENT_PATH and os.path.exists(GITHUB_EVENT_PATH):
 pr_number = event.get('pull_request', {}).get('number')
 repo_name = event.get('repository', {}).get('full_name')
 
-# Parse errorformat: <file>:<line>:<col>:<corr>: <message>
+# Parse errorformat: <file>:<line>:<col>: <message>
 def parse_suggestions(file_path):
     suggestions = []
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            parts = line.strip().split(':', 4)
-            if len(parts) == 5:
-                file, line_num, col, corr, message = parts
+            parts = line.strip().split(':',3)
+            if len(parts) == 4:
+                file, line_num, col, message = parts
                 suggestions.append({
                     'file': file,
                     'line': int(line_num),
                     'col': int(col),
-                    'message': f"{message.strip()}\n```suggestion\n{corr.strip()}\n```"
+                    'message': message
                 })
-    print(suggestions)
+
     return suggestions
 
 def post_suggestion_comment(pr, suggestion):
     commits = list(pr.get_commits())
+
     if not commits:
         print("No commits found in PR.")
         return
 
+    for commit in commits:
+        print(f"Commit SHA: {commit.sha}, Message: {commit.commit.message}")
+    print("Posting suggestion comment...")
     body = f"{suggestion['message']}"
     pr.create_review_comment(
-      body=body,
-      commit=commits[-1].sha,
-      path=suggestion['file'],
-      line=suggestion['line']
+        body=body,
+        commit=commits[-1].sha,
+        path=suggestion['file'],
+        line=suggestion['line']
     )
+    print("Suggestion comment posted successfully.")
 
 def main():
     if not (GITHUB_TOKEN and repo_name and pr_number):
