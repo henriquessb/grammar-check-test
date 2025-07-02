@@ -37,9 +37,10 @@ def post_suggestion_comment(pr, suggestion):
         print("No commits found in PR.")
         return
 
-    for commit in commits:
-        print(f"Commit SHA: {commit.sha}, Message: {commit.commit.message}")
+    print(f"Commit SHA: {commits[-1].sha}, Message: {commits[-1].commit.message}")
+
     print("Posting suggestion comment...")
+
     body = f"{suggestion['message']}"
     pr.create_review_comment(
         body=body,
