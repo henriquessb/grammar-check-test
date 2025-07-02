@@ -42,12 +42,12 @@ def post_suggestion_comment(pr, suggestion):
 
     print("Posting suggestion comment...")
 
-    body = f"{suggestion['message']}"
+    body = suggestion['message'].replace('\\n', '\n')
     pr.create_review_comment(
         body=body,
         commit=commits[-1].sha,
         path=suggestion['file'],
-        line=suggestion['line']
+        line=int(suggestion['line'])
     )
     print("Suggestion comment posted successfully.")
 
