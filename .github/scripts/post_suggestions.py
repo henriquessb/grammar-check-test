@@ -43,12 +43,17 @@ def post_suggestion_comment(pr, suggestion):
     print("Posting suggestion comment...")
 
     body = suggestion['message'].replace('\\n', '\n')
-    pr.create_review_comment(
-        body=body,
-        commit=commits[-1],
-        path=suggestion['file'],
-        line=int(suggestion['line'])
-    )
+    try:
+        pr.create_review_comment(
+            body=body,
+            commit=commits[-1],
+            path=suggestion['file'],
+            line=int(suggestion['line'])
+        )
+    except Exception as e:
+        print(f"Inline comment failed, posting as PR comment instead: {e}")
+        pr.create_issue_comment(f"**Grammar suggestion for `{suggestion['file']}` line {suggestion['line']}**:\n{body}")
+
     print("Suggestion comment posted successfully.")
 
 def main():
