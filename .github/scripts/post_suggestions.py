@@ -1,5 +1,6 @@
 import os
 from github import Github
+import traceback
 
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 GITHUB_EVENT_PATH = os.environ.get('GITHUB_EVENT_PATH')
@@ -68,6 +69,7 @@ def main():
             post_suggestion_comment(pr, suggestion)
         except Exception as e:
             print(f"Failed to post suggestion: {e}")
+            traceback.print_exc()
 
 if __name__ == "__main__":
     main()
