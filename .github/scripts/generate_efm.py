@@ -28,7 +28,7 @@ def main():
                 if text in line:
                     col = line.find(text) + 1
                     modified_line = line.replace(issue["text"], issue["correction"], 1)
-                    msg = f"{issue['explanation'].strip()}\\n```suggestion\\n{modified_line}\\n```"
+                    msg = f"{issue['explanation'].strip()}\n```suggestion\n{modified_line}\n```"
                     lines.append(f"{filename}:{issue['line']}:{col}: {msg}")
                 else:
                     print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
