@@ -56,7 +56,9 @@ def main():
             continue
         original_lines = Path(filename).read_text(encoding="utf-8").splitlines()
         for issue in issues:
-            diagnostics.append(make_rdjsonl_diagnostic(filename, issue, original_lines))
+            diagnostic = make_rdjsonl_diagnostic(filename, issue, original_lines)
+            if diagnostic:
+                diagnostics.append(json.dumps(diagnostic, ensure_ascii=False))
         diagnostics = [d for d in diagnostics if d]
     rdjsonl = "\n".join(diagnostics)
 
