@@ -35,8 +35,8 @@ jobs:
         run: |
           python .github/scripts/grammar_review.py
 
-      - name: Generate rdjson
-        run: python .github/scripts/generate_rdjson.py
+      - name: Generate rdjsonl
+        run: python .github/scripts/generate_rdjsonl.py
 
       - name: Install Reviewdog
         uses: reviewdog/action-setup@v1
@@ -45,11 +45,11 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -f suggestions.rdjson ]; then
-            reviewdog -f=rdjson \
+          if [ -f suggestions.rdjsonl ]; then
+            reviewdog -f=rdjsonl \
               -name="Grammar reviewer" \
               -reporter=github-pr-review \
-              -tee --log-level=debug < suggestions.rdjson
+              -tee --log-level=debug < suggestions.rdjsonl
           else
-            echo "No suggestions.rdjson file found, skipping reviewdog."
+            echo "No suggestions.rdjsonl file found, skipping reviewdog."
           fi
