@@ -12,6 +12,7 @@ def load_issues(path):
 def make_rdjson_diagnostic(filename, issue, original_lines):
     # RDFormat expects 1-based line and column numbers
     line_idx = issue["line"] - 1
+    modified_line = text = issue["text"]
     if line_idx < 0 or line_idx >= len(original_lines):
         # fallback to column 1 if out of range
         start_col = 1
@@ -19,9 +20,9 @@ def make_rdjson_diagnostic(filename, issue, original_lines):
     else:
         line = original_lines[line_idx]
         # Find the first occurrence of the text to be replaced
-        text = issue["text"]
         if text in line:
             start_col = line.find(text) + 1
+            modified_line = line.replace(issue["text"], issue["correction"], 1)
         else:
             print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
             return {}
@@ -41,7 +42,7 @@ def make_rdjson_diagnostic(filename, issue, original_lines):
                     "start": {"line": issue["line"], "column": start_col},
                     "end": {"line": issue["line"], "column": end_col}
                 },
-                "text": issue["correction"]
+                "text": f"{issue['explanation'].strip()}\n```suggestion\n{modified_line}\n```"
             }
         ],
         "severity": "INFO",
@@ -63,7 +64,7 @@ def main():
         "diagnostics": diagnostics
     }
 
-    print(rdjson)
+    print(f"rdjson:\n{rdjson}")
 
     with open(RDJSON_FILE, "w", encoding="utf-8") as f:
         json.dump(rdjson, f, indent=2)
