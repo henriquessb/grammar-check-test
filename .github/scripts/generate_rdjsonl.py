@@ -30,6 +30,7 @@ def make_rdjsonl_diagnostic(filename, issue, original_lines):
     return {
         "message": issue["explanation"],
         "location": {
+            # Use absolute path so reviewdog works with RDFormat
             "path": f"{os.path.abspath(filename)}",
             "range": {
                 "start": {"line": issue["line"], "column": start_col},
