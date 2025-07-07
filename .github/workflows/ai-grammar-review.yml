@@ -49,7 +49,7 @@ jobs:
             reviewdog -f=rdjsonl \
               -name="Grammar reviewer" \
               -reporter=github-pr-review \
-              -tee --log-level=debug < suggestions.rdjsonl
+              -tee -filter-mode=nofilter < suggestions.rdjsonl
           else
             echo "No suggestions.rdjsonl file found, skipping reviewdog."
           fi
