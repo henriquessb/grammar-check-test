@@ -37,6 +37,8 @@ def review_grammar(file_path):
     # Add line numbers to each line
     numbered_content = ''.join(f"{i+1}: {line}" for i, line in enumerate(lines))
 
+    print(numbered_content)
+
     response_schema = {
         "type": "object",
         "properties": {
