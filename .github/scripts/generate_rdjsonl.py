@@ -107,7 +107,7 @@ def main():
 
                 agg_issue = {
                     "line": line,
-                    "text": original_lines[line_issues["line"]-1],
+                    "text": original_lines[line-1],
                     "correction": apply_corrections(original_lines[line-1], original_pieces, corrections),
                     "explanation": explanations
                 }
