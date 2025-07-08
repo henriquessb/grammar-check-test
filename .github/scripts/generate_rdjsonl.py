@@ -2,6 +2,7 @@ import json
 import sys
 import os
 from pathlib import Path
+import difflib
 
 ISSUE_FILE = "issues.json"
 RDJSONL_FILE = "suggestions.rdjsonl"
@@ -9,6 +10,25 @@ RDJSONL_FILE = "suggestions.rdjsonl"
 def load_issues(path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+def apply_diff(original, corrected):
+    matcher = difflib.SequenceMatcher(None, original, corrected)
+    result = []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == 'equal':
+            result.append(original[i1:i2])
+        elif tag == 'replace' or tag == 'insert':
+            result.append(corrected[j1:j2])
+        elif tag == 'delete':
+            continue  # just skip these characters
+    return ''.join(result)
+
+def apply_corrections(original, corrections):
+    current = original
+    for correction in corrections:
+        current = apply_diff(current, correction)
+    return current
+
 
 def make_rdjsonl_diagnostic(filename, issue, original_lines):
     # RDFormat expects 1-based line and column numbers
@@ -57,10 +77,36 @@ def main():
             print(f"⏩[skip] File '{filename}' not found.")
             continue
         original_lines = Path(filename).read_text(encoding="utf-8").splitlines()
+        # Aggregate issues by line
+        issues_by_line = {}
         for issue in issues:
+            line = issue["line"]
+            if line not in issues_by_line:
+                issues_by_line[line] = []
+            issues_by_line[line].append(issue)
+        aggregated_issues = []
+        print("Aggregated issues for file:", filename)
+        for line, line_issues in issues_by_line.items():
+            if len(line_issues) == 1:
+                aggregated_issues.append(line_issues[0])
+            else:
+                explanations = "\n".join(i["explanation"] for i in line_issues)
+                corrections = [i["correction"] for i in line_issues]
+                text = line_issues[0]["text"]
+                agg_issue = {
+                    "line": line,
+                    "text": text,
+                    "correction": apply_corrections(text, corrections),
+                    "explanation": explanations
+                }
+                aggregated_issues.append(agg_issue)
+            print(aggregated_issues[-1] if aggregated_issues else "")
+        print(f"Found {len(aggregated_issues)} aggregated issues in {filename}:")
+        for issue in aggregated_issues:
             diagnostic = make_rdjsonl_diagnostic(filename, issue, original_lines)
             if diagnostic:
                 diagnostics.append(json.dumps(diagnostic, ensure_ascii=False))
+                print(diagnostic)
         diagnostics = [d for d in diagnostics if d]
     rdjsonl = "\n".join(diagnostics)
 
