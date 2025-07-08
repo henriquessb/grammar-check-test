@@ -4,7 +4,7 @@ slug: "2024-12-23-faststore-improvements"
 hidden: false
 type: "added"
 createdAt: "2024-12-23T00:00:00.219Z"
-excerpt: "Improved performance experience for FastStore stores."
+excerpt: "Improved performance for FastStore stores."
 ---
 
 FastStore has undergone significant optimizations to improve mobile performance, achieving a Lighthouse score improvement from 64 to 95.
@@ -31,9 +31,9 @@ Lazy loading has been implemented for sections outside the viewport, such as Car
 
 Several techniques have been implemented to enhance loading speeds and responsiveness:
 
-- **Preconnect and prefetch:** Browser directives that establish early connections to external resources (fonts, images) and prioritize their fetching, resulting in faster loading times. 
+- **Preconnect and prefetch:** Browser directives for establishing early connections to external resources (fonts, images) and prioritizing their fetching, resulting in faster loading times. 
 - **Dynamic imports:** Using [next/dynamic](https://nextjs.org/docs/pages/building-your-application/optimizing/lazy-loading#nextdynamic) to load components efficiently, reducing the impact on initial page load size.
-- **On-demand analytics:** Analytics scripts, triggered by the `sendAnalyticsEvent` method, are now dynamically imported from the `faststore/sdk` library. This ensures that these scripts are loaded only when needed, reducing the initial payload size.
+- **On-demand analytics:** Analytics scripts, triggered by the `sendAnalyticsEvent` method, dynamically imported from the `faststore/sdk` library to ensure they are loaded only when needed, reducing the initial payload size.
 
 ## Why did we make this change?
 
