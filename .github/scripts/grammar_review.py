@@ -112,7 +112,7 @@ def main():
                 post_pr_comment(body)
 
     print("Issues:\n{")
-    for key, value in all_issues:
+    for key, value in all_issues.items():
         print(f"'{key}': {value}")
     print("}")
 
