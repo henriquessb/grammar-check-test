@@ -23,10 +23,21 @@ def apply_diff(original, corrected):
             continue  # just skip these characters
     return ''.join(result)
 
-def apply_corrections(original, corrections):
-    current = original
-    for correction in corrections:
-        current = apply_diff(current, correction)
+def apply_corrections(original_line, original_pieces, corrections):
+    # Replace each original_piece with its corresponding correction
+    corrected_lines = []
+    for orig, corr in zip(original_pieces, corrections):
+        # Replace only the first occurrence of orig with corr in original_line
+        if orig in original_line:
+            replaced = original_line.replace(orig, corr, 1)
+        else:
+            replaced = original_line  # fallback if not found
+        corrected_lines.append(replaced)
+
+    # Apply each corrected_line to original_line using apply_diff
+    current = original_line
+    for corrected in corrected_lines:
+        current = apply_diff(original_line, corrected)
     return current
 
 
@@ -77,7 +88,7 @@ def main():
             print(f"⏩[skip] File '{filename}' not found.")
             continue
         original_lines = Path(filename).read_text(encoding="utf-8").splitlines()
-        # Aggregate issues by line
+        # Aggregate issues by line in a dict, where the key is the line number
         issues_by_line = {}
         for issue in issues:
             line = issue["line"]
@@ -91,12 +102,13 @@ def main():
                 aggregated_issues.append(line_issues[0])
             else:
                 explanations = "\n".join(i["explanation"] for i in line_issues)
+                original_pieces = [i["line"] for i in line_issues]
                 corrections = [i["correction"] for i in line_issues]
-                text = line_issues[0]["text"]
+
                 agg_issue = {
                     "line": line,
-                    "text": text,
-                    "correction": apply_corrections(text, corrections),
+                    "text": original_lines[line_issues["line"]-1],
+                    "correction": apply_corrections(original_lines[line-1], original_pieces, corrections),
                     "explanation": explanations
                 }
                 aggregated_issues.append(agg_issue)
