@@ -43,19 +43,15 @@ jobs:
       # Step 5: Convert issues.json to suggestions.rdjsonl (RDFormat)
       # https://github.com/reviewdog/reviewdog/tree/master/proto/rdf
       - name: Convert issues to rdjsonl
+        if: success() && hashFiles('issues.json') != ''
         run: python .github/scripts/generate_rdjsonl.py
 
       # Step 6: Post suggestions with reviewdog
       - name: Run reviewdog
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -f suggestions.rdjsonl ]; then
-            echo "Posting suggestions with reviewdog."
-            reviewdog -f=rdjsonl \
+        if: success() && hashFiles('suggestions.rdjsonl') != ''
+        run: reviewdog -f=rdjsonl \
               -name="Grammar reviewer" \
               -reporter=github-pr-review \
               -tee -filter-mode=nofilter < suggestions.rdjsonl
-          else
-            echo "No suggestions.rdjsonl file found, skipping reviewdog."
-          fi
