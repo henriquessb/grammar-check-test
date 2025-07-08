@@ -113,7 +113,10 @@ def main():
 
     print("Issues:\n{")
     for key, value in all_issues.items():
-        print(f"'{key}': {value}")
+        print(f"'{key}': [")
+        for item in value:
+            print(f"  {item}")
+        print("]")
     print("}")
 
     # Write all issues to a single issues.json file
