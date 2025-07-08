@@ -24,7 +24,7 @@ def make_rdjsonl_diagnostic(filename, issue, original_lines):
         if text in line:
             start_col = line.find(text) + 1
         else:
-            print(f"[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
+            print(f"⚠️[warn] Text '{text}' not found in line {issue['line']} of '{filename}'.")
             return {}
         end_col = start_col + len(text) if start_col > 0 else 1
     return {
@@ -54,7 +54,7 @@ def main():
     diagnostics = []
     for filename, issues in issues_data.items():
         if not Path(filename).is_file():
-            print(f"[skip] File '{filename}' not found.")
+            print(f"⏩[skip] File '{filename}' not found.")
             continue
         original_lines = Path(filename).read_text(encoding="utf-8").splitlines()
         for issue in issues:
@@ -64,11 +64,9 @@ def main():
         diagnostics = [d for d in diagnostics if d]
     rdjsonl = "\n".join(diagnostics)
 
-    print(f"rdjson:\n{rdjsonl}")
-
     with open(RDJSONL_FILE, "w", encoding="utf-8") as f:
         f.write(rdjsonl)
-    print(f"[done] RDFormat suggestions written to {RDJSONL_FILE}")
+    print(f"✅[done] RDFormat suggestions written to {RDJSONL_FILE}")
 
 if __name__ == "__main__":
     main()
