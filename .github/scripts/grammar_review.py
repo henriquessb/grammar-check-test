@@ -114,5 +114,7 @@ def main():
     with open("issues.json", "w", encoding="utf-8") as f:
         json.dump(all_issues, f, indent=2)
 
+    print("Grammar review completed. Issues saved to issues.json.")
+
 if __name__ == "__main__":
     main()
