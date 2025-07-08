@@ -112,8 +112,8 @@ def main():
                 post_pr_comment(body)
 
     print("Issues:\n{")
-    for issue in all_issues:
-        print(issue)
+    for key, value in all_issues:
+        print(f"'{key}': {value}")
     print("}")
 
     # Write all issues to a single issues.json file
