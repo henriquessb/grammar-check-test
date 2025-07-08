@@ -110,6 +110,12 @@ def main():
             if summary:
                 body = f"### Review for `{file}`\n{summary}"
                 post_pr_comment(body)
+
+    print("Issues:\n{")
+    for issue in all_issues:
+        print(issue)
+    print("}")
+
     # Write all issues to a single issues.json file
     with open("issues.json", "w", encoding="utf-8") as f:
         json.dump(all_issues, f, indent=2)
