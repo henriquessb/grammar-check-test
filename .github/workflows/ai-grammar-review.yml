@@ -31,7 +31,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r .github/scripts/requirements.txt
 
-      - name: Install Reviewdog
+      - name: Install reviewdog
         uses: reviewdog/action-setup@v1
 
       # Step 4: Run grammar reviewer on Markdown files using Gemini and create issues.json file
