@@ -60,7 +60,7 @@ def review_grammar(file_path):
 
     prompt = (
         "Review the following Markdown for grammar issues. "
-        "Each line is prefixed with its line number (e.g., '12: ...'). "
+        "Each line is prefixed with its line number, in the format `[line_number]: [content]`. For example: `1: This is the first line.` "
         "When reporting issues, use the provided line numbers. "
         "Return a JSON object with an 'issues' array (each with line, text, correction, explanation) and a 'summary' string.\n\n"
         f"{numbered_content}"
