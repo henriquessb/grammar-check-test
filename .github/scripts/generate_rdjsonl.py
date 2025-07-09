@@ -74,7 +74,7 @@ def main():
                 issues_by_line[line] = []
             issues_by_line[line].append(issue)
         aggregated_issues = []
-        print("Aggregated issues for file:", filename)
+
         for line, line_issues in issues_by_line.items():
             if len(line_issues) == 1:
                 aggregated_issues.append(line_issues[0])
@@ -94,16 +94,13 @@ def main():
                     "explanation": explanations
                 }
                 aggregated_issues.append(agg_issue)
-            print(aggregated_issues[-1] if aggregated_issues else "")
-        print(f"Found {len(aggregated_issues)} aggregated issues in {filename}:")
+
         for issue in aggregated_issues:
             diagnostic = make_rdjsonl_diagnostic(filename, issue, original_lines)
             if diagnostic:
                 diagnostics.append(json.dumps(diagnostic, ensure_ascii=False))
-                print(diagnostic)
-        diagnostics = [d for d in diagnostics if d]
-    rdjsonl = "\n".join(diagnostics)
 
+    rdjsonl = "\n".join(diagnostics)
     with open(RDJSONL_FILE, "w", encoding="utf-8") as f:
         f.write(rdjsonl)
     print(f"✅[done] RDFormat suggestions written to {RDJSONL_FILE}")
