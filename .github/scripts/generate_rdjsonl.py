@@ -79,7 +79,7 @@ def main():
             if len(line_issues) == 1:
                 aggregated_issues.append(line_issues[0])
             else:
-                explanations = "\n".join(i["explanation"] for i in line_issues)
+                explanations = "- " + "\n- ".join(i["explanation"] for i in line_issues)
                 original_pieces = [i["text"] for i in line_issues]
                 corrections = [i["correction"] for i in line_issues]
 
