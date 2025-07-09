@@ -37,7 +37,7 @@ def apply_corrections(original_line, original_pieces, corrections):
     # Apply each corrected_line to original_line using apply_diff
     current = original_line
     for corrected in corrected_lines:
-        current = apply_diff(original_line, corrected)
+        current = apply_diff(current, corrected)
     return current
 
 
