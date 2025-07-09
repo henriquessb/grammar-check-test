@@ -79,6 +79,10 @@ def main():
             if len(line_issues) == 1:
                 aggregated_issues.append(line_issues[0])
             else:
+                if line < 1 or line > len(original_lines):
+                    print(f"⚠️[warn] Line {line} out of range for file '{filename}'. Skipping aggregation.")
+                    continue
+
                 explanations = "\n- " + "\n- ".join(i["explanation"] for i in line_issues)
                 original_pieces = [i["text"] for i in line_issues]
                 corrections = [i["correction"] for i in line_issues]
