@@ -32,7 +32,7 @@ Master Data has two versions (V1 and V2):
 
 A Document represents a record (or row) within a Data Entity. Each Document has a unique identifier (the `id` Field).
 
-For example, in the `CL` Data Entity, each customer is represented by a Document that includes fields like `id`, `name`, `email`, and other personal details.
+For example, in the `CL` Data Entity, each customer is represented by a Document that includes fields such as `id`, `name`, `email`, and other personal details.
 
 ### Field
 
