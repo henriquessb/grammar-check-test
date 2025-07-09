@@ -111,19 +111,11 @@ def main():
                 body = f"### Review for `{file}`\n{summary}"
                 post_pr_comment(body)
 
-    print("Issues:\n{")
-    for key, value in all_issues.items():
-        print(f"'{key}': [")
-        for item in value:
-            print(f"  {item}")
-        print("]")
-    print("}")
-
     # Write all issues to a single issues.json file
     with open("issues.json", "w", encoding="utf-8") as f:
         json.dump(all_issues, f, indent=2)
 
-    print("Grammar review completed. Issues saved to issues.json.")
+    print("✅ Grammar review completed. Issues saved to issues.json.")
 
 if __name__ == "__main__":
     main()
