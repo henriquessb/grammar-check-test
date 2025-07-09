@@ -2,7 +2,6 @@ import json
 import sys
 import os
 from pathlib import Path
-import difflib
 
 ISSUE_FILE = "issues.json"
 RDJSONL_FILE = "suggestions.rdjsonl"
@@ -11,35 +10,14 @@ def load_issues(path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def apply_diff(original, corrected):
-    matcher = difflib.SequenceMatcher(None, original, corrected)
-    result = []
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-        if tag == 'equal':
-            result.append(original[i1:i2])
-        elif tag == 'replace' or tag == 'insert':
-            result.append(corrected[j1:j2])
-        elif tag == 'delete':
-            continue  # just skip these characters
-    return ''.join(result)
-
 def apply_corrections(original_line, original_pieces, corrections):
-    # Replace each original_piece with its corresponding correction
-    corrected_lines = []
+    corrected_line = original_line
     for orig, corr in zip(original_pieces, corrections):
         # Replace only the first occurrence of orig with corr in original_line
-        if orig in original_line:
-            replaced = original_line.replace(orig, corr, 1)
-        else:
-            replaced = original_line  # fallback if not found
-        corrected_lines.append(replaced)
+        if orig in corrected_line:
+            corrected_line = corrected_line.replace(orig, corr, 1)
 
-    # Apply each corrected_line to original_line using apply_diff
-    current = original_line
-    for corrected in corrected_lines:
-        current = apply_diff(current, corrected)
-    return current
-
+    return corrected_line
 
 def make_rdjsonl_diagnostic(filename, issue, original_lines):
     # RDFormat expects 1-based line and column numbers
