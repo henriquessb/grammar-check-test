@@ -60,7 +60,7 @@ def review_grammar(file_path):
 
     prompt = (
         "Review the following Markdown for grammar issues. "
-        "Each line is prefixed with its line number (e.g., '12: ...'). "
+        "Each line is prefixed with its line number, in the format `[line_number]: [content]`. For example: `1: This is the first line.` "
         "When reporting issues, use the provided line numbers. "
         "Return a JSON object with an 'issues' array (each with line, text, correction, explanation) and a 'summary' string.\n\n"
         f"{numbered_content}"
@@ -110,12 +110,20 @@ def main():
             if summary:
                 body = f"### Review for `{file}`\n{summary}"
                 post_pr_comment(body)
+
+    print("Issues:\n{")
+    for key, value in all_issues.items():
+        print(f"'{key}': [")
+        for item in value:
+            print(f"  {item}")
+        print("]")
+    print("}")
+
     # Write all issues to a single issues.json file
-    all_issues_str = str(all_issues)
-    for i in range(0, len(all_issues_str), 1000):
-        print(all_issues_str[i:i+1000])
     with open("issues.json", "w", encoding="utf-8") as f:
         json.dump(all_issues, f, indent=2)
+
+    print("Grammar review completed. Issues saved to issues.json.")
 
 if __name__ == "__main__":
     main()
