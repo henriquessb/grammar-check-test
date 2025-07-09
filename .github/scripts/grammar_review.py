@@ -1,14 +1,12 @@
 import os
-import requests
 import json
-import glob
+import requests
 from github import Github
+from google import genai
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
 GITHUB_EVENT_PATH = os.environ.get('GITHUB_EVENT_PATH')
-
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=" + GEMINI_API_KEY
 
 # Load PR info
 event = {}
@@ -34,21 +32,54 @@ def get_changed_md_files():
 
 def review_grammar(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-    prompt = f"Review the following Markdown for grammar issues. Suggest corrections and explain any problems found. Do not show the whole original text. Only list the issues, where they occurred and the corrections, plus a summary of the review.\n\n{content}"
-    data = {
-        "contents": [{"parts": [{"text": prompt}]}]
+        lines = f.readlines()
+
+    # Add line numbers to each line
+    numbered_content = ''.join(f"{i+1}: {line}" for i, line in enumerate(lines))
+
+    response_schema = {
+        "type": "object",
+        "properties": {
+            "issues": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "line": {"type": "integer"},
+                        "text": {"type": "string"},
+                        "correction": {"type": "string"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["line", "text", "correction", "explanation"]
+                }
+            },
+            "summary": {"type": "string"}
+        },
+        "required": ["issues", "summary"]
     }
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(GEMINI_API_URL, headers=headers, json=data)
-    if response.ok:
-        result = response.json()
-        try:
-            return result['candidates'][0]['content']['parts'][0]['text']
-        except Exception:
-            return "No review returned."
-    else:
-        return f"Error: {response.text}"
+
+    prompt = (
+        "Review the following Markdown for grammar issues. "
+        "Each line is prefixed with its line number, in the format `[line_number]: [content]`. For example: `1: This is the first line.` "
+        "When reporting issues, use the provided line numbers. "
+        "Return a JSON object with an 'issues' array (each with line, text, correction, explanation) and a 'summary' string.\n\n"
+        f"{numbered_content}"
+    )
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "temperature": 0.2,
+            "response_schema": response_schema
+        }
+    )
+    try:
+        return response.text
+    except Exception:
+        return "No review returned."
 
 def post_pr_comment(body):
     if not (GITHUB_TOKEN and repo_name and pr_number):
@@ -64,11 +95,27 @@ def main():
     if not files:
         print("No Markdown files changed.")
         return
+    all_issues = {}
     for file in files:
         if os.path.exists(file):
             review = review_grammar(file)
-            body = f"### Review for `{file}`\n{review}"
-            post_pr_comment(body)
+            try:
+                review_json = json.loads(review)
+            except Exception:
+                continue
+            # Collect issues for this file
+            all_issues[file] = review_json.get("issues", [])
+            # Post only the summary as a PR comment
+            summary = review_json.get("summary", "")
+            if summary:
+                body = f"### Review for `{file}`\n{summary}"
+                post_pr_comment(body)
+
+    # Write all issues to a single issues.json file
+    with open("issues.json", "w", encoding="utf-8") as f:
+        json.dump(all_issues, f, indent=2)
+
+    print("✅ Grammar review completed. Issues saved to issues.json.")
 
 if __name__ == "__main__":
     main()
